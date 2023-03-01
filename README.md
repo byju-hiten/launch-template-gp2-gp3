@@ -7,5 +7,5 @@
 
 ## Usage 
 - Credentials must be stored in ~/.aws/credentials
-`./final-script-v1.sh REGION PROFILE `
+`bash ./final-script-v2.sh REGION PROFILE `
 

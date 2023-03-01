@@ -17,10 +17,11 @@ for launch in $LIST; do
     if [ $image != "None" ]; then
         gp2image=$(aws ec2 describe-images --filters "Name=block-device-mapping.volume-type,Values=gp2" --image-ids "$image" --region="$region" --query="Images[0].ImageId" --output text)
         if [ $gp2image != "None" ]; then
+            echo "has gp2 image $gp2image"
             storage=$(aws ec2 describe-images --filters "Name=block-device-mapping.volume-type,Values=gp2" --image-ids "$gp2image" --region="$region" --query="Images[0].BlockDeviceMappings[0].Ebs.VolumeSize" --output text)
             #  ./create-ami.sh "$region" "$acc" "$storage" "$gp2image" "$launch" "$version"
-            if [ -z ${newmap[gp2image]} ]; then
-                echo "creating"
+            if [ -z ${newmap["$gp2image"]} ]; then
+                echo "creating as no similar gp2 image exists"
                 INSTANCE_ID=$(aws ec2 run-instances --image-id $gp2image --instance-type t2.micro --region $region --block-device-mappings '[{"DeviceName":"/dev/xvda","Ebs":{"VolumeType":"gp3","DeleteOnTermination":true,"VolumeSize":'$storage'}}]' --query 'Instances[0].InstanceId' --output text)
                 echo "Created instance with ID: $INSTANCE_ID"
                 echo "wait for 90 seconds"
@@ -29,10 +30,11 @@ for launch in $LIST; do
                 echo "image creation sleeping for 210 secs"
                 sleep 210
                 aws ec2 terminate-instances --region $region --instance-ids $INSTANCE_ID
-                newmap[gp2image]="$ami"
+                newmap["$gp2image"]="$ami"
                 ./update-launch-template.sh "$region" "$acc" "$launch" "$ami" "$version"
             else
-                ./update-launch-template.sh "$region" "$acc" "$launch" "${newmap[gp2image]}" "$version"
+                echo "similar gp3 image exists , using that"
+                ./update-launch-template.sh "$region" "$acc" "$launch" "${newmap["$gp2image"]}" "$version"
             fi
         fi
     fi
