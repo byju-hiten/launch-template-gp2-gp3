@@ -8,8 +8,7 @@ echo $region
 echo $acc
 export AWS_PROFILE=$acc
 
-# LIST=$(aws ec2 describe-launch-templates --region $region --query="LaunchTemplates[*].LaunchTemplateId" --output text)
-LIST=$(cat templates.txt)
+LIST=$(aws ec2 describe-launch-templates --region $region --query="LaunchTemplates[*].LaunchTemplateId" --output text)
 
 echo "$acc" >>launch_info.txt
 echo "$region" >>launch_info.txt
@@ -47,8 +46,10 @@ for launch in $LIST; do
 done
 
 echo "refreshing instances"
-./instance-refresh "$region" "$acc"
+./instance-refresh.sh "$region" "$acc" &
 
 echo "sleeping for 210 seconds for image creation"
 sleep 210
-./kill-instances.sh "$region" "$acc"
+./kill-instances.sh "$region" "$acc" &
+
+wait
