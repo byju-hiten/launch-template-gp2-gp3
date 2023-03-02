@@ -8,6 +8,8 @@ echo $region
 echo $acc
 export AWS_PROFILE=$acc
 
+rm -f ./instances.txt
+
 LIST=$(aws ec2 describe-launch-templates --region $region --query="LaunchTemplates[*].LaunchTemplateId" --output text)
 
 echo "$acc" >>launch_info.txt
