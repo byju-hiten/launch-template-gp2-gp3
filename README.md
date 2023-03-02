@@ -5,7 +5,7 @@
 
 ## Usage 
 - Credentials must be stored in ~/.aws/credentials
-`chmod +x final-script-v1.sh`
+`chmod +x final-script-v2.sh`
 `chmod +x create-ami.sh`
 `chmod +x update-launch-template.sh`
 `chmod +x kill-instances.sh`
