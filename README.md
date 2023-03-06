@@ -12,3 +12,4 @@
 `chmod +x instance-refresh.sh`
 `bash ./final-script-v3.sh REGION PROFILE `
 
+- Edit the autoscaling instance refresh preferences as per your requirement . 

@@ -12,7 +12,6 @@ rm -f ./instances.txt
 
 LIST=$(aws autoscaling describe-auto-scaling-groups --region $region --query="AutoScalingGroups[*].AutoScalingGroupName" --output text)
 
-
 for groupName in $LIST; do
 
     launch=$(aws autoscaling describe-auto-scaling-groups --auto-scaling-group-name "$groupName" --region $region --query="AutoScalingGroups[*].MixedInstancesPolicy.LaunchTemplate.LaunchTemplateSpecification.LaunchTemplateId" --output text)
@@ -51,6 +50,7 @@ for groupName in $LIST; do
                 ./update-launch-template.sh "$region" "$acc" "$launch" "${newmap["$gp2image"]}" "$version"
             fi
             echo "starting instance refresh fpr $groupName"
+            echo "$groupName" "$launch" "$versionInfo" "$version" "$gp2image" >>logs.txt
             aws autoscaling start-instance-refresh \
                 --auto-scaling-group-name $groupName \
                 --preferences '{"MinHealthyPercentage": 50,"SkipMatching": true,"ScaleInProtectedInstances": "Refresh","InstanceWarmup": 120}' --region $region
