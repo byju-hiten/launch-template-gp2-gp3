@@ -43,17 +43,18 @@ for groupName in $LIST; do
                 ami=$(aws ec2 create-image --instance-id $INSTANCE_ID --name "ami-i-$INSTANCE_ID" --region $region --description "ami-of-instance-$INSTANCE_ID" --output text)
                 echo "new gp3 image $ami created"
                 newmap["$gp2image"]="$ami"
-                echo "$ami" >>new-ami.txt
+                echo "$ami" "$region" "$acc" "$launch" >>new-ami.txt
                 ./update-launch-template.sh "$region" "$acc" "$launch" "$ami" "$version"
             else
                 echo "similar gp3 image exists , using that"
                 ./update-launch-template.sh "$region" "$acc" "$launch" "${newmap["$gp2image"]}" "$version"
             fi
+
+            echo "$groupName" "$launch" "$versionInfo" "$version" "$gp2image" >>logs_"$region"_"$acc".txt
             echo "starting instance refresh fpr $groupName"
-            echo "$groupName" "$launch" "$versionInfo" "$version" "$gp2image" >>logs.txt
             aws autoscaling start-instance-refresh \
                 --auto-scaling-group-name $groupName \
-                --preferences '{"MinHealthyPercentage": 50,"SkipMatching": true,"ScaleInProtectedInstances": "Refresh","InstanceWarmup": 120}' --region $region
+                --preferences '{"MinHealthyPercentage": 90,"SkipMatching": true,"ScaleInProtectedInstances": "Refresh"}' --region $region
         fi
     fi
 done

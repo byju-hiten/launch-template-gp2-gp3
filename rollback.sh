@@ -21,4 +21,4 @@ while read -r groupName launch versionInfo version gp2image; do
             --auto-scaling-group-name $groupName \
             --preferences '{"MinHealthyPercentage": 50,"SkipMatching": true,"ScaleInProtectedInstances": "Refresh","InstanceWarmup": 120}' --region $region
     fi
-done >logs.txt
+done <logs_"$region"_"$acc".txt
